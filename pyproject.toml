@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools"]
+[project]
+name = "bibtex-postprocessor"
+version = "1.0.0"
+authors = [
+  { name="Eelis Peltola", email="eelis.peltola@aalto.fi" },
+]
+description = "Process bibtex files into a nicer format with clear entry key names."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dynamic = ["dependencies", "optional-dependencies"]
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+optional-dependencies.dev = { file = ["requirements-dev.txt"] }
+[project.scripts]
+bibtex-postprocessor = "bibtex_postprocessor:bibtex_postprocessor"
