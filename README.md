@@ -2,21 +2,34 @@
 
 Process the `bibtex` file from Endnote into a nicer format:
 
-* Citation names are changed into the format `<<first author's surname>><<year>><<first word from title>>`.
+* Citation names are changed into the format `[first author's surname][year][first word from title]`.
+* Filename is written with `.bib` suffix instead of `.txt`
 
 ##  Setup
+
+### User setup
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
-pip install .[dev]
+pip install .
+```
+
+### Dev setup
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -e .[dev]
 pre-commit install
 ```
 
 ## Usage
 
 ```bash
+source .venv/bin/activate  # If not already in virtualenv
 bibtex-postprocessor --help
 ```
 
