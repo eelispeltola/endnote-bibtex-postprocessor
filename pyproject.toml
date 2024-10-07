@@ -18,4 +18,4 @@ dynamic = ["dependencies", "optional-dependencies"]
 dependencies = {file = ["requirements.txt"]}
 optional-dependencies.dev = { file = ["requirements-dev.txt"] }
 [project.scripts]
-bibtex-postprocessor = "bibtex_postprocessor:bibtex_postprocessor"
+bibtex-postprocessor = "bibtex_postprocessor:cli"

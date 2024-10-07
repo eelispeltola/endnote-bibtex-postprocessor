@@ -3,10 +3,14 @@ from pathlib import Path
 import re
 
 import bibtexparser
+import click
 
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
+
+# For click
+CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 
 def read_bibtex(filepath: Path) -> bibtexparser.Library:
@@ -88,10 +92,17 @@ def postprocess_bibtex(filepath: Path, new_filepath: Path | None = None):
     write_bibtex(new_filepath, modded_library)
 
 
-def main():
-    fp = Path("/mnt/c/Users/peltole13/Downloads/My EndNote Library.txt")
-    postprocess_bibtex(fp)
-
-
-if __name__ == "__main__":
-    main()
+@click.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("bibtex_file", type=click.Path(exists=True))
+@click.option(
+    "--new-filename", help="If specified, writes file to this filename instead."
+)
+def cli(bibtex_file, new_filename):
+    """
+    Postprocess BIBTEX_FILE so that entry keys are written as
+    [first author's surname][year][first longer word in title].
+    Writes to BIBTEX_FILE, unless it has some other suffix than '.bib', then
+    writes to that filename but with the '.bib' suffix.
+    """
+    bibtex_file = Path(bibtex_file)
+    postprocess_bibtex(bibtex_file, new_filename)

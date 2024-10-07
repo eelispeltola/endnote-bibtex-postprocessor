@@ -6,7 +6,7 @@ Process the `bibtex` file from Endnote into a nicer format:
 
 ##  Setup
 
-```
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
@@ -16,7 +16,9 @@ pre-commit install
 
 ## Usage
 
-
+```bash
+bibtex-postprocessor --help
+```
 
 ## Linting, formatting, and typechecks
 
