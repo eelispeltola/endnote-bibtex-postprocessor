@@ -88,7 +88,7 @@ def postprocess_bibtex(filepath: Path, new_filepath: Path | None = None):
     modded_library = rename_entry_keys(library)
     if not new_filepath:
         # Ensure new file has '.bib' suffix
-        new_filepath = filepath.parent / (filepath.name + ".bib")
+        new_filepath = filepath.parent / (filepath.stem + ".bib")
     write_bibtex(new_filepath, modded_library)
 
 

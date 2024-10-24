@@ -4,6 +4,7 @@ Process the `bibtex` file from Endnote into a nicer format:
 
 * Citation names are changed into the format `[first author's surname][year][first word from title]`.
 * Filename is written with `.bib` suffix instead of `.txt`
+* Filename's whitespaces are converted to underscores
 
 ##  Setup
 
