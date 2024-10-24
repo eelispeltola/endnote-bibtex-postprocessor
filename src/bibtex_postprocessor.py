@@ -87,8 +87,18 @@ def postprocess_bibtex(filepath: Path, new_filepath: Path | None = None):
     library = read_bibtex(filepath)
     modded_library = rename_entry_keys(library)
     if not new_filepath:
-        # Ensure new file has '.bib' suffix
-        new_filepath = filepath.parent / (filepath.stem + ".bib")
+        # Ensure new file has '.bib' suffix and no whitespace
+        new_filepath = filepath.parent / (filepath.stem.replace(" ", "_") + ".bib")
+    else:
+        new_filepath = Path(new_filepath)
+        if new_filepath.suffix != ".bib":
+            logger.warning(
+                "The new filename's suffix is not '.bib', it might not work with your LaTEx compiler."
+            )
+        if new_filepath.name.find(" ") > 0:
+            logger.warning(
+                "The new filename has whitespace(s), it might not work with your LaTEx compiler."
+            )
     write_bibtex(new_filepath, modded_library)
 
 
