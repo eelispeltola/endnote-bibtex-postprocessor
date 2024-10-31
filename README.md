@@ -5,6 +5,7 @@ Process the `bibtex` file from Endnote into a nicer format:
 * Citation names are changed into the format `[first author's surname][year][first word from title]`.
 * Filename is written with `.bib` suffix instead of `.txt`
 * Filename's whitespaces are converted to underscores
+* (Optionally: all notes are removed from the resulting bibliography)
 
 ##  Setup
 
@@ -13,9 +14,26 @@ Process the `bibtex` file from Endnote into a nicer format:
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install --upgrade pip
 pip install .
 ```
+
+## Usage
+
+To postprocess an EndNote-generated `bibtex` file into a format allowed by
+Overleaf, try the following:
+
+```bash
+source .venv/bin/activate
+bibtex-postprocessor "path/to/My EndNote Library.txt"
+```
+
+See the internal documentation for full usage instructions:
+
+```bash
+bibtex-postprocessor --help
+```
+
+## Development
 
 ### Dev setup
 
@@ -27,14 +45,7 @@ pip install -e .[dev]
 pre-commit install
 ```
 
-## Usage
-
-```bash
-source .venv/bin/activate  # If not already in virtualenv
-bibtex-postprocessor --help
-```
-
-## Linting, formatting, and typechecks
+### Linting, formatting, and typechecks
 
 This project template uses the following tools for autoformatting, linting and typechecking:
 

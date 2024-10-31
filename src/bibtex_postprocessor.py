@@ -61,6 +61,20 @@ def rename_entry_keys(library: bibtexparser.Library) -> bibtexparser.Library:
     return library
 
 
+def remove_note_field(library: bibtexparser.Library) -> bibtexparser.Library:
+    """
+    Remove the 'note' field from each entry. Prevents notes from passing into the
+    """
+    for entry in library.entries:
+        try:
+            entry.pop("note")
+            logger.debug(f"Removed note from entry {entry.key}")
+        except KeyError:
+            pass
+
+    return library
+
+
 def write_bibtex(filepath: Path, library: bibtexparser.Library):
     """
     Write bibtexparser library into a bibtex file. Remove extra spacing in front and between entries.
@@ -83,12 +97,21 @@ def write_bibtex(filepath: Path, library: bibtexparser.Library):
     logger.info(f"Wrote fixed bibliography to '{filepath}'")
 
 
-def postprocess_bibtex(filepath: Path, new_filepath: Path | None = None):
+def postprocess_bibtex(
+    filepath: Path, new_filepath: Path | None = None, remove_notes: bool = True
+):
     library = read_bibtex(filepath)
     modded_library = rename_entry_keys(library)
+    if remove_notes:
+        modded_library = remove_note_field(modded_library)
     if not new_filepath:
         # Ensure new file has '.bib' suffix and no whitespace
         new_filepath = filepath.parent / (filepath.stem.replace(" ", "_") + ".bib")
+        if str(new_filepath) == str(filepath):
+            raise FileExistsError(
+                "New filepath is same as the old filepath, not overwriting. Try setting a new filename."
+            )
+
     else:
         new_filepath = Path(new_filepath)
         if new_filepath.suffix != ".bib":
@@ -107,12 +130,19 @@ def postprocess_bibtex(filepath: Path, new_filepath: Path | None = None):
 @click.option(
     "--new-filename", help="If specified, writes file to this filename instead."
 )
-def cli(bibtex_file, new_filename):
+@click.option(
+    "--remove-notes",
+    is_flag=True,
+    help="Remove the 'note' field from all entries.",
+)
+def cli(bibtex_file, new_filename, remove_notes):
     """
     Postprocess BIBTEX_FILE so that entry keys are written as
-    [first author's surname][year][first longer word in title].
-    Writes to BIBTEX_FILE, unless it has some other suffix than '.bib', then
-    writes to that filename but with the '.bib' suffix.
+    [first author's surname][year][first longer word in title],
+    and write the result in a new file.
     """
     bibtex_file = Path(bibtex_file)
-    postprocess_bibtex(bibtex_file, new_filename)
+    try:
+        postprocess_bibtex(bibtex_file, new_filename, remove_notes)
+    except Exception as e:
+        logger.error(f"Error: {e}")
