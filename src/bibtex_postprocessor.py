@@ -75,6 +75,22 @@ def remove_note_field(library: bibtexparser.Library) -> bibtexparser.Library:
     return library
 
 
+def add_braces_to_title_field(library: bibtexparser.Library) -> bibtexparser.Library:
+    """
+    Adds curly braces around all titles, preserving their styling (casing).
+    """
+    for entry in library.entries:
+        try:
+            entry.fields_dict["title"].value = (
+                "{" + entry.fields_dict["title"].value + "}"
+            )
+        except KeyError:
+            pass
+    logger.debug("Modified titles to be encased in curly braces.")
+
+    return library
+
+
 def write_bibtex(filepath: Path, library: bibtexparser.Library):
     """
     Write bibtexparser library into a bibtex file. Remove extra spacing in front and between entries.
@@ -98,12 +114,17 @@ def write_bibtex(filepath: Path, library: bibtexparser.Library):
 
 
 def postprocess_bibtex(
-    filepath: Path, new_filepath: Path | None = None, remove_notes: bool = True
+    filepath: Path,
+    new_filepath: Path | None = None,
+    remove_notes: bool = False,
+    preserve_titles: bool = False,
 ):
     library = read_bibtex(filepath)
     modded_library = rename_entry_keys(library)
     if remove_notes:
         modded_library = remove_note_field(modded_library)
+    if preserve_titles:
+        modded_library = add_braces_to_title_field(modded_library)
     if not new_filepath:
         # Ensure new file has '.bib' suffix and no whitespace
         new_filepath = filepath.parent / (filepath.stem.replace(" ", "_") + ".bib")
@@ -135,7 +156,12 @@ def postprocess_bibtex(
     is_flag=True,
     help="Remove the 'note' field from all entries.",
 )
-def cli(bibtex_file, new_filename, remove_notes):
+@click.option(
+    "--preserve-titles",
+    is_flag=True,
+    help="Add curly braces around all entries' titles, preserving their styling (casing). Note that some publications require specific casing for titles, which this messes with!",
+)
+def cli(bibtex_file, new_filename, remove_notes, preserve_titles):
     """
     Postprocess BIBTEX_FILE so that entry keys are written as
     [first author's surname][year][first longer word in title],
@@ -143,6 +169,6 @@ def cli(bibtex_file, new_filename, remove_notes):
     """
     bibtex_file = Path(bibtex_file)
     try:
-        postprocess_bibtex(bibtex_file, new_filename, remove_notes)
+        postprocess_bibtex(bibtex_file, new_filename, remove_notes, preserve_titles)
     except Exception as e:
         logger.error(f"Error: {e}")
