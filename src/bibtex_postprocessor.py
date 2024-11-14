@@ -49,15 +49,26 @@ def rename_entry_keys(library: bibtexparser.Library) -> bibtexparser.Library:
                 f"Missing information (year, author, or title) for entry {entry.key}"
             )
 
-        # Take first sensible word from the title
+        # Take first sensible word from the title. Discard 'the' and other short words.
         split_title = re.split("[:\"'\`,\s]", title)
         first_good_word_in_title = split_title[0]
         for part in split_title:
-            if len(part) > 2 and part != "the":
+            if len(part) > 1 and part not in ["an", "of", "to", "in", "on", "the"]:
                 first_good_word_in_title = part
                 break
-        entry.key = f"{first_author_surname}{year}{first_good_word_in_title}"
-
+        key_candidate = f"{first_author_surname}{year}{first_good_word_in_title}"
+        # Check if key is already in use
+        library_keys = [entry.key for entry in library.entries]
+        if key_candidate in library_keys:
+            logger.debug(
+                f"Key '{key_candidate}' already exists in library. Appending entry key with a number."
+            )
+            i = 2
+            while f"{key_candidate}{i}" in library_keys:
+                i += 1
+            entry.key = f"{key_candidate}{i}"
+        else:
+            entry.key = key_candidate
     return library
 
 
@@ -165,7 +176,9 @@ def cli(bibtex_file, new_filename, remove_notes, preserve_titles):
     """
     Postprocess BIBTEX_FILE so that entry keys are written as
     [first author's surname][year][first longer word in title],
-    and write the result in a new file.
+    and write the result in a new file. The first longer word is at least 2
+    characters long and is not any of the following: "an", "of", "to", "in",
+    "on", or "the". Optionally remove notes and add braces to titles.
     """
     bibtex_file = Path(bibtex_file)
     try:
