@@ -35,8 +35,8 @@ def read_bibtex(filepath: Path) -> bibtexparser.Library:
 
 def rename_entry_keys(library: bibtexparser.Library) -> bibtexparser.Library:
     """
-    For each entry in the library, grab the first author's surname, year, and the first sensible word
-    (over two characters and not 'the') from the title, and combine them to generate a new key for that entry.
+    For each entry in the library, grab the first author's surname, year, and the first proper word from the title,
+    and combine them to generate a new key for that entry.
     """
     for entry in library.entries:
         try:
@@ -74,7 +74,7 @@ def rename_entry_keys(library: bibtexparser.Library) -> bibtexparser.Library:
 
 def remove_note_field(library: bibtexparser.Library) -> bibtexparser.Library:
     """
-    Remove the 'note' field from each entry. Prevents notes from passing into the
+    Remove the 'note' field from each entry. Prevents notes from passing into the final bibliography.
     """
     for entry in library.entries:
         try:
@@ -88,7 +88,7 @@ def remove_note_field(library: bibtexparser.Library) -> bibtexparser.Library:
 
 def add_braces_to_title_field(library: bibtexparser.Library) -> bibtexparser.Library:
     """
-    Adds curly braces around all titles, preserving their styling (casing).
+    Add curly braces around all titles, preserving their styling (casing).
     """
     for entry in library.entries:
         try:

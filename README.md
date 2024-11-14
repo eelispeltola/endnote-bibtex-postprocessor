@@ -6,6 +6,7 @@ Process the `bibtex` file from Endnote into a nicer format:
 * Filename is written with `.bib` suffix instead of `.txt`
 * Filename's whitespaces are converted to underscores
 * (Optionally: all notes are removed from the resulting bibliography)
+* (Optionally: Encase all titles inside curly braces to preserve their formatting)
 
 ##  Setup
 
@@ -47,7 +48,7 @@ pre-commit install
 
 ### Linting, formatting, and typechecks
 
-This project template uses the following tools for autoformatting, linting and typechecking:
+This project uses the following tools for autoformatting, linting and typechecking:
 
 * mypy: typechecks
 * ruff: linting and formatting
