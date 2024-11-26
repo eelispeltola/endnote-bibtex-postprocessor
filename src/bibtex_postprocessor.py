@@ -35,7 +35,7 @@ def read_bibtex(filepath: Path) -> bibtexparser.Library:
 
 def rename_entry_keys(library: bibtexparser.Library) -> bibtexparser.Library:
     """
-    For each entry in the library, grab the first author's surname, year, and the first proper word from the title,
+    For each entry in the library, grab the first author's surname, year, and the first word(s) from the title,
     and combine them to generate a new key for that entry.
     """
     for entry in library.entries:
@@ -49,14 +49,17 @@ def rename_entry_keys(library: bibtexparser.Library) -> bibtexparser.Library:
                 f"Missing information (year, author, or title) for entry {entry.key}"
             )
 
-        # Take first sensible word from the title. Discard 'the' and other short words.
+        # Take the first one to three words from the title. Discard article words.
         split_title = re.split("[:\"'\`,\s]", title)
-        first_good_word_in_title = split_title[0]
+        split_title = [part for part in split_title if part not in ["a", "an", "the"]]
+        title_identifier = ""
         for part in split_title:
-            if len(part) > 1 and part not in ["an", "of", "to", "in", "on", "the"]:
-                first_good_word_in_title = part
+            if len(title_identifier) > 2:
                 break
-        key_candidate = f"{first_author_surname}{year}{first_good_word_in_title}"
+            else:
+                title_identifier = title_identifier + part
+        key_candidate = f"{first_author_surname}{year}{title_identifier}"
+
         # Check if key is already in use
         library_keys = [entry.key for entry in library.entries]
         if key_candidate in library_keys:
@@ -88,7 +91,7 @@ def remove_note_field(library: bibtexparser.Library) -> bibtexparser.Library:
 
 def add_braces_to_title_field(library: bibtexparser.Library) -> bibtexparser.Library:
     """
-    Add curly braces around all titles, preserving their styling (casing).
+    Add curly braces around all titles, preserving their capitalization.
     """
     for entry in library.entries:
         try:
@@ -170,15 +173,14 @@ def postprocess_bibtex(
 @click.option(
     "--preserve-titles",
     is_flag=True,
-    help="Add curly braces around all entries' titles, preserving their styling (casing). Note that some publications require specific casing for titles, which this messes with!",
+    help="Add curly braces around all entries' titles, preserving their capitalization. Note that some publications require specific capitalization for titles, which this messes with!",
 )
 def cli(bibtex_file, new_filename, remove_notes, preserve_titles):
     """
     Postprocess BIBTEX_FILE so that entry keys are written as
-    [first author's surname][year][first longer word in title],
-    and write the result in a new file. The first longer word is at least 2
-    characters long and is not any of the following: "an", "of", "to", "in",
-    "on", or "the". Optionally remove notes and add braces to titles.
+    [first author's surname][year][title identifier],
+    and write the result in a new file. The title identifier is the first one to three words of the title, exluding
+    articles. Optionally remove notes and preserve capitalization in titles by adding {}.
     """
     bibtex_file = Path(bibtex_file)
     try:
