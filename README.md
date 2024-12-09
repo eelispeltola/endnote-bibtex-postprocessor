@@ -10,7 +10,7 @@ Process the `bibtex` file from Endnote into a nicer format:
 
 ##  Setup
 
-### User setup
+### User setup (Linux/Mac)
 
 ```bash
 python3 -m venv .venv
