@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 import re
+import unicodedata
 
 import bibtexparser
 import click
@@ -60,6 +61,13 @@ def rename_entry_keys(library: bibtexparser.Library) -> bibtexparser.Library:
                 title_identifier = title_identifier + part
         key_candidate = f"{first_author_surname}{year}{title_identifier}"
 
+        # Strip diacritics etc. from the key
+        key_candidate = "".join(
+            c
+            for c in unicodedata.normalize("NFD", key_candidate)
+            if unicodedata.category(c) != "Mn"
+        )
+
         # Check if key is already in use
         library_keys = [entry.key for entry in library.entries]
         if key_candidate in library_keys:
@@ -116,10 +124,17 @@ def write_bibtex(filepath: Path, library: bibtexparser.Library):
     bibtex_format = bibtexparser.BibtexFormat()
     bibtex_format.block_separator = "\n"
     library_str = bibtexparser.write_string(library, bibtex_format=bibtex_format)
+
     # Match first character that is not \ufeff or whitespace and remove everything before that
     match = re.search(r"[^\ufeff|\s]", library_str)
     if match:
         library_str = library_str[match.start() :]
+
+    # Prepend any & not in an url with \ to comply with bibtex (at least in Overleaf)
+    library_str = "".join(
+        line if "url = {" in line else line.replace("&", r"\&")
+        for line in library_str.splitlines(keepends=True)
+    )
 
     with open(filepath, "w") as f:
         f.write(library_str)

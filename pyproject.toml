@@ -2,7 +2,7 @@
 requires = ["setuptools"]
 [project]
 name = "bibtex-postprocessor"
-version = "1.0.0"
+version = "1.1.0"
 authors = [
   { name="Eelis Peltola", email="eelis.peltola@aalto.fi" },
 ]
