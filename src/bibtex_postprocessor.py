@@ -43,7 +43,7 @@ def rename_entry_keys(library: bibtexparser.Library) -> bibtexparser.Library:
         try:
             year = entry.fields_dict["year"].value
             authors = entry.fields_dict["author"].value.lower()
-            first_author_surname = re.split("[,\s]", authors)[0]
+            first_author_surname = re.split(r"[,\s]", authors)[0]
             title = entry.fields_dict["title"].value.lower()
         except KeyError:
             raise KeyError(
@@ -51,7 +51,7 @@ def rename_entry_keys(library: bibtexparser.Library) -> bibtexparser.Library:
             )
 
         # Take the first one to three words from the title. Discard article words.
-        split_title = re.split("[:\"'\`,\s]", title)
+        split_title = re.split(r"[:\"'\`,\s]", title)
         split_title = [part for part in split_title if part not in ["a", "an", "the"]]
         title_identifier = ""
         for part in split_title:
