@@ -1,5 +1,6 @@
 [build-system]
 requires = ["setuptools"]
+
 [project]
 name = "bibtex-postprocessor"
 version = "1.1.0"
@@ -14,8 +15,13 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dynamic = ["dependencies", "optional-dependencies"]
+
+[tool.uv]
+exclude-newer = "7 days"
+
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 optional-dependencies.dev = { file = ["requirements-dev.txt"] }
+
 [project.scripts]
 bibtex-postprocessor = "bibtex_postprocessor:cli"
